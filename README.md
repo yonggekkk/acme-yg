@@ -32,3 +32,6 @@ bash <(curl -Ls https://gitlab.com/rwkgyg/acme-script/raw/main/acme.sh)
 
 #### 注意：使用80端口模式时，会强制释放80端口，且不建议与nginx、caddy类带有自动申请证书的应用同时使用
 
+-------------------------------------------------------------
+### 感谢你右上角的star🌟
+[![Stargazers over time](https://starchart.cc/yonggekkk/acme-yg.svg)](https://starchart.cc/yonggekkk/acme-yg)
