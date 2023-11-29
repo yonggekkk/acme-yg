@@ -38,7 +38,3 @@ bash <(curl -Ls https://gitlab.com/rwkgyg/acme-script/raw/main/acme.sh)
 
 ![47d4c68b8200aff3d4c94288f9adf81](https://github.com/yonggekkk/acme-yg/assets/121604513/deb30cc7-5469-40b5-b747-0b1f481ec825)
 
-
--------------------------------------------------------------
-### 感谢你右上角的star🌟
-[![Stargazers over time](https://starchart.cc/yonggekkk/acme-yg.svg)](https://starchart.cc/yonggekkk/acme-yg)
