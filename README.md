@@ -18,7 +18,17 @@ bash <(curl -Ls https://gitlab.com/rwkgyg/acme-script/raw/main/acme.sh)
 
 6：两个证书文件存放在root/ygkkkca文件中
 
-7：已集成于[sing-box-yg脚本](https://github.com/yonggekkk/sing-box-yg)、[x-ui-yg脚本](https://github.com/yonggekkk/x-ui-yg)、[naiveproxy-yg脚本](https://github.com/yonggekkk/NaiveProxy-yg)、[hysteria-yg脚本](https://github.com/yonggekkk/Hysteria-yg)、[tuic-yg脚本](https://github.com/yonggekkk/Tuic-yg)，以上脚本可共享一个证书
+7：已集成以下代理脚本中（可共享一个证书）：
+
+[sing-box-yg脚本](https://github.com/yonggekkk/sing-box-yg)
+
+[x-ui-yg脚本](https://github.com/yonggekkk/x-ui-yg)
+
+[naiveproxy-yg脚本](https://github.com/yonggekkk/NaiveProxy-yg)
+
+[hysteria-yg脚本](https://github.com/yonggekkk/Hysteria-yg)
+
+[tuic-yg脚本](https://github.com/yonggekkk/Tuic-yg)
 
 #### 注意：使用80端口模式时，会强制释放80端口，且不建议与nginx、caddy类带有自动申请证书的应用同时使用
 
