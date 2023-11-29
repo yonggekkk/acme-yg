@@ -4,6 +4,10 @@
 ```
 bash <(curl -Ls https://gitlab.com/rwkgyg/acme-script/raw/main/acme.sh)
 ```
+或者
+```
+bash <(wget -qO- https://gitlab.com/rwkgyg/acme-script/raw/main/acme.sh 2> /dev/null)
+```
 ---------------------------------------
 #### 功能与特点：
 1：支持纯IPV4、纯IPV6、双栈VPS
