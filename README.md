@@ -30,9 +30,9 @@ bash <(wget -qO- https://gitlab.com/rwkgyg/acme-script/raw/main/acme.sh 2> /dev/
 
 [naiveproxy-yg脚本](https://github.com/yonggekkk/NaiveProxy-yg)
 
-[hysteria-yg脚本](https://github.com/yonggekkk/Hysteria-yg)
+[hysteria-yg脚本](https://github.com/yonggekkk/Hysteria-yg)(已停更)
 
-[tuic-yg脚本](https://github.com/yonggekkk/Tuic-yg)
+[tuic-yg脚本](https://github.com/yonggekkk/Tuic-yg)(已停更)
 
 #### 注意：使用80端口模式时，会强制释放80端口，且不建议与nginx、caddy类带有自动申请证书的应用同时使用
 
