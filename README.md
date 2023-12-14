@@ -42,3 +42,9 @@ bash <(wget -qO- https://gitlab.com/rwkgyg/acme-script/raw/main/acme.sh 2> /dev/
 
 ![47d4c68b8200aff3d4c94288f9adf81](https://github.com/yonggekkk/acme-yg/assets/121604513/deb30cc7-5469-40b5-b747-0b1f481ec825)
 
+---------------------------------------
+#### 声明：
+
+#### 该项目使用base64加密，可自行解密，介意者请勿使用
+
+#### 所有代码来源于Github社区与ChatGPT的整合；如您需要开源代码，请提Issues留下您的联系邮箱
