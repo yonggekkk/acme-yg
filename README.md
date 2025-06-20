@@ -2,11 +2,11 @@
 -------------------------------------
 ### 一键脚本
 ```
-bash <(curl -Ls https://gitlab.com/rwkgyg/acme-script/raw/main/acme.sh)
+bash <(curl -Ls https://raw.githubusercontent.com/yonggekkk/acme-yg/main/acme.sh)
 ```
 或者
 ```
-bash <(wget -qO- https://gitlab.com/rwkgyg/acme-script/raw/main/acme.sh 2> /dev/null)
+bash <(wget -qO- https://raw.githubusercontent.com/yonggekkk/acme-yg/main/acme.sh)
 ```
 ---------------------------------------
 #### 功能与特点：
@@ -43,8 +43,4 @@ bash <(wget -qO- https://gitlab.com/rwkgyg/acme-script/raw/main/acme.sh 2> /dev/
 ![47d4c68b8200aff3d4c94288f9adf81](https://github.com/yonggekkk/acme-yg/assets/121604513/deb30cc7-5469-40b5-b747-0b1f481ec825)
 
 ---------------------------------------
-#### 声明：
-
-#### 该项目使用base64加密，可自行解密，介意者请勿使用，[加密原因在此](https://ygkkk.blogspot.com/2022/06/github.html)
-
-#### 所有代码来源于Github社区与ChatGPT的整合；如您需要开源代码，请提Issues留下您的联系邮箱
+#### 声明：所有代码来源于Github社区与ChatGPT的整合
