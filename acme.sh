@@ -192,9 +192,9 @@ vpsip="$v6 或者 $v4"
 else
 vpsip=$v4
 fi
-domainIP=$(dig @8.8.8.8 +time=2 +short "$ym" 2>/dev/null)
+domainIP=$(dig @8.8.8.8 +time=2 +short "$ym" 2>/dev/null | grep -m1 '^[0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+$')
 if echo $domainIP | grep -q "network unreachable\|timed out" || [[ -z $domainIP ]]; then
-domainIP=$(dig @2001:4860:4860::8888 +time=2 aaaa +short "$ym" 2>/dev/null)
+domainIP=$(dig @2001:4860:4860::8888 +time=2 aaaa +short "$ym" 2>/dev/null | grep -m1 ':')
 fi
 if echo $domainIP | grep -q "network unreachable\|timed out" || [[ -z $domainIP ]] ; then
 red "未解析出IP，请检查域名是否输入有误" 
