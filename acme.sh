@@ -230,6 +230,9 @@ fi
 }
 
 checkacmeca(){
+if [[ "${ym}" == *ip6.arpa* ]]; then
+red "目前不支持ip6.arpa域名申请证书" && exit
+fi
 nowca=`bash ~/.acme.sh/acme.sh --list | tail -1 | awk '{print $1}'`
 if [[ $nowca == $ym ]]; then
 red "经检测，输入的域名已有证书申请记录，不用重复申请"
@@ -246,18 +249,10 @@ green "已输入的域名:$ym" && sleep 1
 checkacmeca
 checkip
 if [[ $domainIP = $v4 ]]; then
-if [[ "${ym}" == *ip6.arpa* ]]; then
-bash ~/.acme.sh/acme.sh --issue -d ${ym} --standalone -k ec-256 --server https://acme.ssl.com/sslcom-dv-rsa --insecure
-else
 bash ~/.acme.sh/acme.sh --issue -d ${ym} --standalone -k ec-256 --server letsencrypt --insecure
 fi
-fi
 if [[ $domainIP = $v6 ]]; then
-if [[ "${ym}" == *ip6.arpa* ]]; then
-bash ~/.acme.sh/acme.sh --issue -d ${ym} --standalone -k ec-256 --server https://acme.ssl.com/sslcom-dv-rsa --listen-v6 --insecure
-else
 bash ~/.acme.sh/acme.sh --issue -d ${ym} --standalone -k ec-256 --server letsencrypt --listen-v6 --insecure
-fi
 fi
 installCA
 checktls
