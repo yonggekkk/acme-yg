@@ -246,10 +246,18 @@ green "已输入的域名:$ym" && sleep 1
 checkacmeca
 checkip
 if [[ $domainIP = $v4 ]]; then
-bash ~/.acme.sh/acme.sh  --issue -d ${ym} --standalone -k ec-256 --server letsencrypt --insecure
+if [[ "${ym}" == *ip6.arpa* ]]; then
+bash ~/.acme.sh/acme.sh --issue -d ${ym} --standalone -k ec-256 --server https://acme.ssl.com/sslcom-dv-rsa --insecure
+else
+bash ~/.acme.sh/acme.sh --issue -d ${ym} --standalone -k ec-256 --server letsencrypt --insecure
+fi
 fi
 if [[ $domainIP = $v6 ]]; then
-bash ~/.acme.sh/acme.sh  --issue -d ${ym} --standalone -k ec-256 --server letsencrypt --listen-v6 --insecure
+if [[ "${ym}" == *ip6.arpa* ]]; then
+bash ~/.acme.sh/acme.sh --issue -d ${ym} --standalone -k ec-256 --server https://acme.ssl.com/sslcom-dv-rsa --listen-v6 --insecure
+else
+bash ~/.acme.sh/acme.sh --issue -d ${ym} --standalone -k ec-256 --server letsencrypt --listen-v6 --insecure
+fi
 fi
 installCA
 checktls
