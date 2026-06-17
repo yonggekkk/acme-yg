@@ -244,6 +244,36 @@ yellow "如果一定要重新申请，请先执行删除证书选项" && exit
 fi
 }
 
+ACMEstandaloneIP(){
+v4v6
+if [[ -z $v4 ]]; then
+vpsip=$v6
+elif [[ -n $v4 && -n $v6 ]]; then
+vpsip="$v4 或者 $v6"
+else
+vpsip=$v4
+fi
+green "VPS本地的IP：$vpsip"
+if [[ "$v6" == "2a09"* || "$v4" == "104.28"* ]]; then
+red "经检测，你申请了WARP的IP。请关闭WARP后再申请IP证书" && exit
+fi
+readp "请输入申请IP证书的IP【格式：IPV4或者IPV6或者IPV4 IPV6，回车跳过使用${vpsip%% *}】:" ym
+if [[ -z $ym ]]; then
+ym=${vpsip%% *}
+fi
+checkacmeca
+ip1=$(echo $ym | awk '{print $1}')
+if [[ "$ym" == *" "* && "$ym" == *":"* ]]; then
+ip2=$(echo $ym | awk '{print $2}')
+bash ~/.acme.sh/acme.sh --issue -d "$ip1" -d "$ip2" --standalone -k ec-256 --server letsencrypt --cert-profile shortlived --days 3 --insecure
+else
+bash ~/.acme.sh/acme.sh --issue -d "$ym" --standalone -k ec-256 --server letsencrypt --cert-profile shortlived --days 3 --insecure
+fi
+bash ~/.acme.sh/acme.sh --install-cert -d "$ip1" --key-file /root/ygkkkca/private.key --fullchain-file /root/ygkkkca/cert.crt --ecc
+echo "bash ~/.acme.sh/acme.sh --install-cert -d "$ip1" --key-file /root/ygkkkca/private.key --fullchain-file /root/ygkkkca/cert.crt --ecc"
+checktls
+}
+
 ACMEstandaloneDNS(){
 v4v6
 #vpsip=${v4:-$v6}
@@ -355,13 +385,30 @@ systemctl start warp-go >/dev/null 2>&1
 fi
 }
 
+ACMEstandaloneIPcheck(){
+wgcfv6=$(curl -s6m6 https://www.cloudflare.com/cdn-cgi/trace -k | grep warp | cut -d= -f2)
+wgcfv4=$(curl -s4m6 https://www.cloudflare.com/cdn-cgi/trace -k | grep warp | cut -d= -f2)
+if [[ ! $wgcfv4 =~ on|plus && ! $wgcfv6 =~ on|plus ]]; then
+ACMEstandaloneIP
+else
+systemctl stop wg-quick@wgcf >/dev/null 2>&1
+kill -15 $(pgrep warp-go) >/dev/null 2>&1 && sleep 2
+ACMEstandaloneIP
+systemctl start wg-quick@wgcf >/dev/null 2>&1
+systemctl restart warp-go >/dev/null 2>&1
+systemctl enable warp-go >/dev/null 2>&1
+systemctl start warp-go >/dev/null 2>&1
+fi
+}
+
 acme(){
 mkdir -p /root/ygkkkca
-ab="1.选择独立80端口模式申请证书（仅需域名，小白推荐），安装过程中将强制释放80端口\n2.选择DNS API模式申请证书（需域名、ID、Key），自动识别单域名与泛域名\n 请选择："
+ab="1.选择独立80端口模式申请IP证书（无需域名，小白推荐）\n2.选择独立80端口模式申请域名证书（需域名）\n3.选择DNS API模式申请证书（需域名、ID、Key），自动识别单域名与泛域名\n 请选择："
 readp "$ab" cd
 case "$cd" in 
-1 ) acme2 && acme3 && ACMEstandaloneDNScheck;;
-2 ) acme3 && ACMEDNScheck;;
+1 ) acme2 && acme3 && ACMEstandaloneIPcheck;;
+2 ) acme2 && acme3 && ACMEstandaloneDNScheck;;
+3 ) acme3 && ACMEDNScheck;;
 esac
 }
 
@@ -407,7 +454,7 @@ rm /tmp/crontab.tmp
 }
 acmerenew(){
 [[ -z $(~/.acme.sh/acme.sh -v 2>/dev/null) ]] && yellow "未安装acme.sh证书申请，无法执行" && exit 
-green "以下显示的域名就是已申请成功的域名证书"
+green "以下显示的域名就是已申请成功的主证书"
 bash ~/.acme.sh/acme.sh --list | tail -1 | awk '{print $1}'
 echo
 #ab="1.无脑一键续期所有证书（推荐）\n2.选择指定的域名证书续期\n0.返回上一层\n 请选择："
@@ -455,9 +502,9 @@ white "甬哥Github项目  ：github.com/yonggekkk"
 white "甬哥blogger博客 ：ygkkk.blogspot.com"
 white "甬哥YouTube频道 ：www.youtube.com/@ygkkk"
 yellow "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" 
-green "Acme-yg脚本版本号 V26.3.11"
+green "Acme-yg脚本版本号 V26.6.17"
 yellow "提示："
-yellow "1、脚本不支持多IP的VPS，SSH登录的IP与VPS共网IP必须一致"
+yellow "1、SSH登录的IP与VPS共网IP必须一致"
 yellow "2、80端口模式仅支持单域名证书申请，在80端口不被占用的情况下支持自动续期"
 yellow "3、DNS API模式不支持freenom免费域名申请，支持单域名与泛域名证书申请，无条件自动续期"
 yellow "4、泛域名申请前须在服务商解析处设置一个名称为 * 字符的解析记录 (输入格式：*.一级或者二级主域)"
@@ -470,7 +517,7 @@ blue "当前已申请成功的证书（域名形式）："
 yellow "$caacme"
 echo
 red "========================================================================="
-green " 1. acme.sh申请letsencrypt ECC证书（支持80端口模式与DNS API模式） "
+green " 1. acme.sh申请letsencrypt ECC证书（支持IP证书模式、域名证书模式、DNS API模式） "
 green " 2. 查询已申请成功的域名及自动续期时间点 "
 green " 3. 手动一键证书续期 "
 green " 4. 删除证书并卸载一键ACME证书申请脚本 "
