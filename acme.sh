@@ -263,8 +263,8 @@ ym=${vpsip%% *}
 fi
 checkacmeca
 if [[ "$ym" == *" "* && "$ym" == *":"* ]]; then
-ip1=$(echo $ym | awk '{print $1}')
-ip2=$(echo $ym | awk '{print $2}')
+ip1=$(echo $ym | awk '{print $1}' | tr -d '\r\n ')
+ip2=$(echo $ym | awk '{print $2}' | tr -d '\r\n ')
 bash ~/.acme.sh/acme.sh --issue -d "$ip1" -d "$ip2" --standalone -k ec-256 --server letsencrypt --cert-profile shortlived --days 3 --insecure
 elif [[ "$ym" != *":"* ]]; then
 bash ~/.acme.sh/acme.sh --issue -d "$ym" --standalone -k ec-256 --server letsencrypt --cert-profile shortlived --days 3 --insecure
@@ -272,6 +272,7 @@ else
 bash ~/.acme.sh/acme.sh --issue -d "$ym" --standalone -k ec-256 --server letsencrypt --cert-profile shortlived --days 3 --insecure
 fi
 bash ~/.acme.sh/acme.sh --install-cert -d "$ip1" --key-file /root/ygkkkca/private.key --fullchain-file /root/ygkkkca/cert.crt --ecc
+echo "bash ~/.acme.sh/acme.sh --install-cert -d "$ip1" --key-file /root/ygkkkca/private.key --fullchain-file /root/ygkkkca/cert.crt --ecc"
 checktls
 }
 
