@@ -249,7 +249,7 @@ v4v6
 if [[ -z $v4 ]]; then
 vpsip=$v6
 elif [[ -n $v4 && -n $v6 ]]; then
-vpsip="$v6 或者 $v4"
+vpsip="$v4 或者 $v6"
 else
 vpsip=$v4
 fi
@@ -257,7 +257,10 @@ green "VPS本地的IP：$vpsip"
 if [[ "$v6" == "2a09"* || "$v4" == "104.28"* ]]; then
 red "经检测，你申请了WARP的IP。请关闭WARP后再申请IP证书" && exit
 fi
-readp "请输入申请IP证书的IP【格式：IPV4或者IPV6或者IPV4 IPV6】:" ym
+readp "请输入申请IP证书的IP【格式：IPV4或者IPV6或者IPV4 IPV6，回车跳过使用${vpsip%% *}】:" ym
+if [[ -z $ym ]]; then
+ym=${vpsip%% *}
+fi
 checkacmeca
 if [[ "$ym" == *" "* && "$ym" == *":"* ]]; then
 ip1=$(echo $ym | awk '{print $1}')
