@@ -262,12 +262,10 @@ if [[ -z $ym ]]; then
 ym=${vpsip%% *}
 fi
 checkacmeca
+ip1=$(echo $ym | awk '{print $1}')
 if [[ "$ym" == *" "* && "$ym" == *":"* ]]; then
-ip1=$(echo $ym | awk '{print $1}' | tr -d '\r\n ')
-ip2=$(echo $ym | awk '{print $2}' | tr -d '\r\n ')
+ip2=$(echo $ym | awk '{print $2}')
 bash ~/.acme.sh/acme.sh --issue -d "$ip1" -d "$ip2" --standalone -k ec-256 --server letsencrypt --cert-profile shortlived --days 3 --insecure
-elif [[ "$ym" != *":"* ]]; then
-bash ~/.acme.sh/acme.sh --issue -d "$ym" --standalone -k ec-256 --server letsencrypt --cert-profile shortlived --days 3 --insecure
 else
 bash ~/.acme.sh/acme.sh --issue -d "$ym" --standalone -k ec-256 --server letsencrypt --cert-profile shortlived --days 3 --insecure
 fi
