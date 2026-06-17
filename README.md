@@ -12,7 +12,7 @@ bash <(wget -qO- https://raw.githubusercontent.com/yonggekkk/acme-yg/main/acme.s
 #### 功能与特点：
 1：支持纯IPV4、纯IPV6、双栈VPS
 
-2：支持IP证书申请、域名证书申请、DNS API模式，支持单域名与泛域名
+2：支持IP、域名、DNS API三种方式申请证书，支持单域名与泛域名
 
 3：80端口模式支持【没有域名也能申请域名证书】，利用nip.io后缀域名解析IP申请域名证书
 
