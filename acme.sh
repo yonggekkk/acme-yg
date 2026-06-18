@@ -142,9 +142,9 @@ fi
 }
 
 checktls(){
-if [[ -f /root/ygkkkca/cert.crt && -f /root/ygkkkca/private.key ]] && [[ -s /root/ygkkkca/cert.crt && -s /root/ygkkkca/private.key ]]; then
+if [[ -s /root/ygkkkca/cert.crt && -s /root/ygkkkca/private.key ]]; then
 cronac
-green "域名证书申请成功或已存在！域名证书（cert.crt）和密钥（private.key）已保存到 /root/ygkkkca文件夹内" 
+green "IP域名证书申请成功或已存在！域名证书（cert.crt）和密钥（private.key）已保存到 /root/ygkkkca文件夹内" 
 yellow "公钥文件crt路径如下，可直接复制"
 green "/root/ygkkkca/cert.crt"
 yellow "密钥文件key路径如下，可直接复制"
@@ -171,13 +171,13 @@ bash ~/.acme.sh/acme.sh --uninstall >/dev/null 2>&1
 rm -rf /root/ygkkkca
 rm -rf ~/.acme.sh acme.sh
 uncronac
-red "遗憾，域名证书申请失败，建议如下："
-yellow "1、如果解析到的IP是104.2开头的或者172开头的IP，请确保CF中的CDN黄云已关闭，解析的IP必须是VPS的本地IP"
+red "遗憾，IP域名证书申请失败，建议如下："
+yellow "1、如果你是域名证书申请：如果解析到的IP是104.2开头的或者172开头的IP，请确保CF中的CDN黄云已关闭，解析的IP必须是VPS的本地IP"
 echo
-yellow "2、更换下二级域名自定义名称再尝试执行重装脚本（重要）"
+yellow "2、如果你是域名证书申请：更换下二级域名自定义名称再尝试执行重装脚本（重要）"
 green "例：原二级域名 x.ygkkk.eu.org 或 x.ygkkk.cf ，在cloudflare中重命名其中的x名称"
 echo
-yellow "3、因为同个本地IP连续多次申请证书有时间限制，等一段时间再重装脚本" && exit
+yellow "3、如果你是IP证书或者域名证书申请：因为同个本地IP连续多次申请证书有时间限制，等一段时间再重装脚本" && exit
 fi
 }
 
@@ -270,7 +270,6 @@ else
 bash ~/.acme.sh/acme.sh --issue -d "$ym" --standalone -k ec-256 --server letsencrypt --cert-profile shortlived --days 3 --insecure
 fi
 bash ~/.acme.sh/acme.sh --install-cert -d "$ip1" --key-file /root/ygkkkca/private.key --fullchain-file /root/ygkkkca/cert.crt --ecc
-echo "bash ~/.acme.sh/acme.sh --install-cert -d "$ip1" --key-file /root/ygkkkca/private.key --fullchain-file /root/ygkkkca/cert.crt --ecc"
 checktls
 }
 
