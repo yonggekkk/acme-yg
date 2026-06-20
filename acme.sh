@@ -166,8 +166,8 @@ fi
 if [[ -f '/etc/s-box/sb.json' ]]; then
 blue "检测到Sing-box内核代理，如果你安装了甬哥的Sing-box-yg脚本，请在Sing-box脚本执行申请/变更证书，此证书将自动应用"
 fi
-if [[ -f "$HOME/agsbx/xr.json" || -f "$HOME/agsbx/sb.json" ]]; then
-blue "检测到sing-box或者xray内核代理，如果你安装了甬哥的Argosbx小钢炮脚本，HY2/TUIC/AnyTLS三大协议将支持IP域名证书"
+if [[ -f "$HOME/agsbx/sb.json" ]]; then
+blue "检测到sing-box内核代理，如果你安装了甬哥的Argosbx小钢炮脚本，HY2/TUIC/AnyTLS三大协议将支持IP域名证书"
 fi
 else
 bash ~/.acme.sh/acme.sh --uninstall >/dev/null 2>&1
