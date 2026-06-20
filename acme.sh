@@ -155,16 +155,19 @@ if [[ -f '/etc/hysteria/config.json' ]]; then
 blue "检测到Hysteria-1代理协议，如果你安装了甬哥的Hysteria脚本，请在Hysteria脚本执行申请/变更证书，此证书将自动应用"
 fi
 if [[ -f '/etc/caddy/Caddyfile' ]]; then
-blue "检测到Naiveproxy代理协议，如果你安装了甬哥的Naiveproxy脚本，请在Naiveproxy脚本执行申请/变更证书，此证书将自动应用"
+blue "检测到Naiveproxy代理协议，如果你安装了甬哥的Naiveproxy-yg脚本，请在Naiveproxy脚本执行申请/变更证书，此证书将自动应用"
 fi
 if [[ -f '/etc/tuic/tuic.json' ]]; then
 blue "检测到Tuic代理协议，如果你安装了甬哥的Tuic脚本，请在Tuic脚本执行申请/变更证书，此证书将自动应用"
 fi
 if [[ -f '/usr/bin/x-ui' ]]; then
-blue "检测到x-ui（xray代理协议），如果你安装了甬哥的x-ui脚本，开启tls选项，此证书将自动应用"
+blue "检测到x-ui（xray代理协议），如果你安装了甬哥的x-ui-yg脚本，开启tls选项，此证书将自动应用"
 fi
 if [[ -f '/etc/s-box/sb.json' ]]; then
-blue "检测到Sing-box内核代理，如果你安装了甬哥的Sing-box脚本，请在Sing-box脚本执行申请/变更证书，此证书将自动应用"
+blue "检测到Sing-box内核代理，如果你安装了甬哥的Sing-box-yg脚本，请在Sing-box脚本执行申请/变更证书，此证书将自动应用"
+fi
+if [[ -f "$HOME/agsbx/xr.json" || -f "$HOME/agsbx/sb.json" ]]; then
+blue "检测到sing-box或者xray内核代理，如果你安装了甬哥的Argosbx小钢炮脚本，HY2/TUIC/AnyTLS三大协议将支持IP域名证书"
 fi
 else
 bash ~/.acme.sh/acme.sh --uninstall >/dev/null 2>&1
