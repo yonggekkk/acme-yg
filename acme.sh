@@ -444,7 +444,7 @@ fi
 cronac(){
 uncronac
 crontab -l > /tmp/crontab.tmp
-echo "0 0 * * * bash ~/.acme.sh/acme.sh --cron -f >/dev/null 2>&1" >> /tmp/crontab.tmp
+echo "0 0 * * * bash ~/.acme.sh/acme.sh --cron >/dev/null 2>&1" >> /tmp/crontab.tmp
 crontab /tmp/crontab.tmp
 rm /tmp/crontab.tmp
 }
