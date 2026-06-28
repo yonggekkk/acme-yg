@@ -149,7 +149,7 @@ yellow "公钥文件crt路径如下，可直接复制"
 green "/root/ygkkkca/cert.crt"
 yellow "密钥文件key路径如下，可直接复制"
 green "/root/ygkkkca/private.key"
-ym=`bash ~/.acme.sh/acme.sh --list | tail -1 | awk '{print $1}'`
+ym=`bash ~/.acme.sh/acme.sh --list | awk 'NR>1{print $1}' | tail -1`
 echo $ym > /root/ygkkkca/ca.log
 if [[ -f '/etc/hysteria/config.json' ]]; then
 blue "检测到Hysteria-1代理协议，如果你安装了甬哥的Hysteria脚本，请在Hysteria脚本执行申请/变更证书，此证书将自动应用"
@@ -238,7 +238,7 @@ checkacmeca(){
 if [[ "${ym}" == *ip6.arpa* ]]; then
 red "目前不支持ip6.arpa域名申请证书" && exit
 fi
-nowca=`bash ~/.acme.sh/acme.sh --list | tail -1 | awk '{print $1}'`
+nowca=`bash ~/.acme.sh/acme.sh --list | awk 'NR>1{print $1}' | tail -1`
 if [[ $nowca == $ym ]]; then
 red "经检测，输入的域名已有证书申请记录，不用重复申请"
 red "证书申请记录如下："
@@ -431,7 +431,7 @@ bash ~/.acme.sh/acme.sh --list
 
 acmeshow(){
 if [[ -n $(~/.acme.sh/acme.sh -v 2>/dev/null) ]]; then
-caacme1=`bash ~/.acme.sh/acme.sh --list | tail -1 | awk '{print $1}'`
+caacme1=`bash ~/.acme.sh/acme.sh --list | awk 'NR>1{print $1}' | tail -1`
 if [[ -n $caacme1 && ! $caacme1 == "Main_Domain" ]] && [[ -f /root/ygkkkca/cert.crt && -f /root/ygkkkca/private.key && -s /root/ygkkkca/cert.crt && -s /root/ygkkkca/private.key ]]; then
 caacme=$caacme1
 else
@@ -457,7 +457,7 @@ rm /tmp/crontab.tmp
 acmerenew(){
 [[ -z $(~/.acme.sh/acme.sh -v 2>/dev/null) ]] && yellow "未安装acme.sh证书申请，无法执行" && exit 
 green "以下显示的域名就是已申请成功的主证书"
-bash ~/.acme.sh/acme.sh --list | tail -1 | awk '{print $1}'
+bash ~/.acme.sh/acme.sh --list | awk 'NR>1{print $1}' | tail -1
 echo
 #ab="1.无脑一键续期所有证书（推荐）\n2.选择指定的域名证书续期\n0.返回上一层\n 请选择："
 #readp "$ab" cd
