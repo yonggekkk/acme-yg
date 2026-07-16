@@ -327,20 +327,20 @@ case "$cd" in
 #bash ~/.acme.sh/acme.sh --issue --dns dns_cf -d ${ym} -k ec-256 --server letsencrypt --listen-v6 --insecure
 #fi
 1 )
-echo -e "${yellow}请选择 Cloudflare API 验证方式：${plain}"
-echo -e "${green}1. DNS API Token (推荐，权限受限)${plain}"
-echo -e "${green}2. Global API Key (旧版)${plain}"
+yellow "请选择 Cloudflare DNS API 验证方式："
+yellow "1. API Token (推荐)"
+yellow "2. Global API Key"
 readp "请选择【1-2】：" cf_choice
 if [ "$cf_choice" = "1" ]; then
-    readp "请输入 Cloudflare DNS API Token：" CFToken
-    export CF_Token="$CFToken"
-    readp "请输入 Cloudflare Account ID (账户 ID)：" CFAccountID
+    readp "请输入 Cloudflare Account ID (账户ID)：" CFAccountID
     export CF_Account_ID="$CFAccountID"
+    readp "请输入 Cloudflare DNS API Token (API令牌)：" CFToken
+    export CF_Token="$CFToken"
 else
-    readp "请复制Cloudflare的Global API Key：" GAK
-    export CF_Key="$GAK"
     readp "请输入登录Cloudflare的注册邮箱地址：" CFemail
     export CF_Email="$CFemail"
+    readp "请复制Cloudflare的Global API Key：" GAK
+    export CF_Key="$GAK"
 fi
 if [[ $domainIP = $v4 ]]; then
 bash ~/.acme.sh/acme.sh --issue --dns dns_cf -d ${ym} -k ec-256 --server letsencrypt --insecure
