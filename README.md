@@ -27,7 +27,9 @@ bash <(wget -qO- https://raw.githubusercontent.com/yonggekkk/acme-yg/main/acme.s
 
 6：手动一键或者指定续期域名证书
 
-7：两个证书文件存放在root/ygkkkca文件中
+7：域名证书与 IP 证书可同时维护，分别存放在 `/root/ygkkkca/domain` 与 `/root/ygkkkca/ip`
+
+为兼容现有代理脚本，`/root/ygkkkca/cert.crt`、`private.key` 和 `ca.log` 会保留为软链接；域名证书存在时优先指向域名证书，否则指向 IP 证书。再次申请另一类证书不会卸载 acme.sh，也不会覆盖已有证书记录。
 
 8：已集成以下代理脚本中（可共享一个证书）：
 
