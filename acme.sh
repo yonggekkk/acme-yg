@@ -10,6 +10,38 @@ yellow(){ echo -e "\033[33m\033[01m$1\033[0m";}
 white(){ echo -e "\033[37m\033[01m$1\033[0m";}
 readp(){ read -p "$(yellow "$1")" $2;}
 [[ $EUID -ne 0 ]] && yellow "请以root模式运行脚本" && exit
+certbase=${ACME_YG_CERT_BASE:-/root/ygkkkca}
+domaincertdir=$certbase/domain
+ipcertdir=$certbase/ip
+
+migrate_legacy_cert(){
+mkdir -p "$domaincertdir" "$ipcertdir"
+if [[ -s $certbase/cert.crt && ! -L $certbase/cert.crt && -s $certbase/private.key && ! -L $certbase/private.key ]]; then
+if openssl x509 -in "$certbase/cert.crt" -noout -ext subjectAltName 2>/dev/null | grep -q 'DNS:'; then
+targetdir=$domaincertdir
+else
+targetdir=$ipcertdir
+fi
+[[ -s $targetdir/cert.crt ]] || cp -p "$certbase/cert.crt" "$targetdir/cert.crt"
+[[ -s $targetdir/private.key ]] || cp -p "$certbase/private.key" "$targetdir/private.key"
+[[ ! -s $certbase/ca.log || -s $targetdir/ca.log ]] || cp -p "$certbase/ca.log" "$targetdir/ca.log"
+fi
+}
+
+sync_legacy_cert_links(){
+local target
+if [[ -s $domaincertdir/cert.crt && -s $domaincertdir/private.key ]]; then
+target=domain
+elif [[ -s $ipcertdir/cert.crt && -s $ipcertdir/private.key ]]; then
+target=ip
+else
+return
+fi
+ln -sfn "$target/cert.crt" "$certbase/cert.crt"
+ln -sfn "$target/private.key" "$certbase/private.key"
+ln -sfn "$target/ca.log" "$certbase/ca.log"
+}
+[[ ${ACME_YG_LIB_ONLY:-0} == 1 ]] && return 0
 #[[ -e /etc/hosts ]] && grep -qE '^ *172.65.251.78 gitlab.com' /etc/hosts || echo -e '\n172.65.251.78 gitlab.com' >> /etc/hosts
 if [[ -f /etc/redhat-release ]]; then
 release="Centos"
@@ -117,6 +149,10 @@ sleep 2
 fi
 }
 acme3(){
+if [[ -n $(~/.acme.sh/acme.sh -v 2>/dev/null) ]]; then
+green "检测到 acme.sh 已安装，将保留现有账户和证书记录"
+return
+fi
 readp "请输入注册所需的邮箱（回车跳过则自动生成虚拟gmail邮箱）：" Aemail
 if [ -z $Aemail ]; then
 auto=`date +%s%N |md5sum | cut -c 1-6`
@@ -124,9 +160,6 @@ Aemail=$auto@gmail.com
 fi
 yellow "当前注册的邮箱名称：$Aemail"
 green "开始安装acme.sh申请证书脚本"
-bash ~/.acme.sh/acme.sh --uninstall >/dev/null 2>&1
-rm -rf ~/.acme.sh acme.sh
-uncronac
 wget -N https://github.com/Neilpang/acme.sh/archive/master.tar.gz >/dev/null 2>&1
 tar -zxvf master.tar.gz >/dev/null 2>&1
 cd acme.sh-master >/dev/null 2>&1
@@ -142,15 +175,17 @@ fi
 }
 
 checktls(){
-if [[ -s /root/ygkkkca/cert.crt && -s /root/ygkkkca/private.key ]]; then
+local certdir=$1
+local certname=$2
+if [[ -s $certdir/cert.crt && -s $certdir/private.key ]]; then
 cronac
-green "IP域名证书申请成功或已存在！域名证书（cert.crt）和密钥（private.key）已保存到 /root/ygkkkca文件夹内" 
+green "$certname 证书申请成功或已存在！"
 yellow "公钥文件crt路径如下，可直接复制"
-green "/root/ygkkkca/cert.crt"
+green "$certdir/cert.crt"
 yellow "密钥文件key路径如下，可直接复制"
-green "/root/ygkkkca/private.key"
-ym=`bash ~/.acme.sh/acme.sh --list | awk 'NR>1{print $1}' | tail -1`
-echo $ym > /root/ygkkkca/ca.log
+green "$certdir/private.key"
+echo "$ym" > "$certdir/ca.log"
+sync_legacy_cert_links
 if [[ -f '/etc/hysteria/config.json' ]]; then
 blue "检测到Hysteria-1代理协议，如果你安装了甬哥的Hysteria脚本，请在Hysteria脚本执行申请/变更证书，此证书将自动应用"
 fi
@@ -170,11 +205,7 @@ if [[ -f "$HOME/agsbx/sb.json" ]]; then
 blue "检测到sing-box内核代理，如果你安装了甬哥的Argosbx小钢炮脚本，HY2/TUIC/AnyTLS/Naiveproxy四大协议将支持IP域名证书"
 fi
 else
-bash ~/.acme.sh/acme.sh --uninstall >/dev/null 2>&1
-rm -rf /root/ygkkkca
-rm -rf ~/.acme.sh acme.sh
-uncronac
-red "遗憾，IP域名证书申请失败，建议如下："
+red "遗憾，$certname 证书申请失败，建议如下："
 yellow "1、如果你是域名证书申请：如果解析到的IP是104.2开头的或者172开头的IP，请确保CF中的CDN黄云已关闭，解析的IP必须是VPS的本地IP"
 echo
 yellow "2、如果你是域名证书申请：更换下二级域名自定义名称再尝试执行重装脚本（重要）"
@@ -185,7 +216,8 @@ fi
 }
 
 installCA(){
-bash ~/.acme.sh/acme.sh --install-cert -d ${ym} --key-file /root/ygkkkca/private.key --fullchain-file /root/ygkkkca/cert.crt --ecc
+mkdir -p "$domaincertdir"
+bash ~/.acme.sh/acme.sh --install-cert -d ${ym} --key-file "$domaincertdir/private.key" --fullchain-file "$domaincertdir/cert.crt" --ecc
 }
 
 checkip(){
@@ -238,8 +270,7 @@ checkacmeca(){
 if [[ "${ym}" == *ip6.arpa* ]]; then
 red "目前不支持ip6.arpa域名申请证书" && exit
 fi
-nowca=`bash ~/.acme.sh/acme.sh --list | awk 'NR>1{print $1}' | tail -1`
-if [[ $nowca == $ym ]]; then
+if bash ~/.acme.sh/acme.sh --list | awk 'NR>1{print $1}' | grep -Fxq -- "$ym"; then
 red "经检测，输入的域名已有证书申请记录，不用重复申请"
 red "证书申请记录如下："
 bash ~/.acme.sh/acme.sh --list
@@ -272,8 +303,10 @@ bash ~/.acme.sh/acme.sh --issue -d "$ip1" -d "$ip2" --standalone -k ec-256 --ser
 else
 bash ~/.acme.sh/acme.sh --issue -d "$ym" --standalone -k ec-256 --server letsencrypt --cert-profile shortlived --days 3 --insecure
 fi
-bash ~/.acme.sh/acme.sh --install-cert -d "$ip1" --key-file /root/ygkkkca/private.key --fullchain-file /root/ygkkkca/cert.crt --ecc
-checktls
+mkdir -p "$ipcertdir"
+bash ~/.acme.sh/acme.sh --install-cert -d "$ip1" --key-file "$ipcertdir/private.key" --fullchain-file "$ipcertdir/cert.crt" --ecc
+ym=$ip1
+checktls "$ipcertdir" "IP"
 }
 
 ACMEstandaloneDNS(){
@@ -293,7 +326,7 @@ if [[ $domainIP = $v6 ]]; then
 bash ~/.acme.sh/acme.sh --issue -d ${ym} --standalone -k ec-256 --server letsencrypt --listen-v6 --insecure
 fi
 installCA
-checktls
+checktls "$domaincertdir" "域名"
 }
 
 ACMEDNS(){
@@ -370,7 +403,7 @@ bash ~/.acme.sh/acme.sh --issue --dns dns_ali -d ${ym} -k ec-256 --server letsen
 fi
 esac
 installCA
-checktls
+checktls "$domaincertdir" "域名"
 }
 
 ACMEDNScheck(){
@@ -422,7 +455,8 @@ fi
 }
 
 acme(){
-mkdir -p /root/ygkkkca
+mkdir -p "$domaincertdir" "$ipcertdir"
+migrate_legacy_cert
 ab="1.选择独立80端口模式申请IP证书（无需域名，小白推荐）\n2.选择独立80端口模式申请域名证书（需域名）\n3.选择DNS API模式申请证书（需域名、ID、Key），自动识别单域名与泛域名\n 请选择："
 readp "$ab" cd
 case "$cd" in 
@@ -449,8 +483,8 @@ bash ~/.acme.sh/acme.sh --list
 
 acmeshow(){
 if [[ -n $(~/.acme.sh/acme.sh -v 2>/dev/null) ]]; then
-caacme1=`bash ~/.acme.sh/acme.sh --list | awk 'NR>1{print $1}' | tail -1`
-if [[ -n $caacme1 && ! $caacme1 == "Main_Domain" ]] && [[ -f /root/ygkkkca/cert.crt && -f /root/ygkkkca/private.key && -s /root/ygkkkca/cert.crt && -s /root/ygkkkca/private.key ]]; then
+caacme1=`bash ~/.acme.sh/acme.sh --list | awk 'NR>1{print $1}'`
+if [[ -n $caacme1 ]]; then
 caacme=$caacme1
 else
 caacme='无证书申请记录'
@@ -482,8 +516,10 @@ echo
 #case "$cd" in 
 #1 ) 
 green "开始续期证书…………" && sleep 3
-bash ~/.acme.sh/acme.sh --cron -f
-checktls
+bash ~/.acme.sh/acme.sh --cron
+[[ -s $domaincertdir/cert.crt ]] && green "域名证书已更新：$domaincertdir"
+[[ -s $ipcertdir/cert.crt ]] && green "IP证书已更新：$ipcertdir"
+sync_legacy_cert_links
 #;;
 #2 ) 
 #readp "请输入要续期的域名证书（复制Main_Domain下显示的域名）:" ym
@@ -528,8 +564,9 @@ yellow "1、SSH登录的IP与VPS本地IP必须一致"
 yellow "2、80端口模式仅支持单域名证书申请，在80端口不被占用的情况下支持自动续期"
 yellow "3、DNS API模式不支持freenom免费域名申请，支持单域名与泛域名证书申请，无条件自动续期"
 yellow "4、泛域名申请前须在服务商解析处设置一个名称为 * 字符的解析记录 (输入格式：*.一级或者二级主域)"
-yellow "公钥文件crt保存路径：/root/ygkkkca/cert.crt"
-yellow "密钥文件key保存路径：/root/ygkkkca/private.key"
+yellow "域名证书保存路径：/root/ygkkkca/domain"
+yellow "IP证书保存路径：/root/ygkkkca/ip"
+yellow "兼容路径：/root/ygkkkca/cert.crt 与 private.key（优先指向域名证书）"
 echo
 red "========================================================================="
 acmeshow
